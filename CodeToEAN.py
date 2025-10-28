@@ -63,8 +63,8 @@ NOME_PLANILHA = "planilha.xlsx"
 #     COLUNA_BUSCA = "Código de barras"
 #     COLUNA_RENOME = "Código"
 
-COLUNA_BUSCA = "Código de barras"           # coluna usada para localizar no nome dos arquivos
-COLUNA_RENOME = "Código"                    # coluna usada para renomear os arquivos
+COLUNA_BUSCA = "Código"           # coluna usada para localizar no nome dos arquivos
+COLUNA_RENOME = "Código de barras"                    # coluna usada para renomear os arquivos
 
 # === CONSTRUÇÃO DOS CAMINHOS ===
 desktop = Path.home() / "Desktop"
@@ -92,6 +92,10 @@ def escolher_arquivo_preferido(lista_caminhos):
     if pngs:
         lista_caminhos = pngs
     return max(lista_caminhos, key=lambda f: f.stat().st_size)
+
+def nome_valido_windows(nome):
+    """Remove caracteres inválidos em nomes de arquivo no Windows."""
+    return re.sub(r'[<>:"/\\|?*]', '_', nome)
 
 # === LER PLANILHA ===
 if not arquivo_excel.exists():
@@ -126,7 +130,7 @@ for _, linha in df.iterrows():
     if candidatos:
         escolhido = escolher_arquivo_preferido(candidatos)
         extensao = escolhido.suffix
-        destino = pasta_saida / f"{valor_renome}{extensao}"
+        destino = pasta_saida / f"{nome_valido_windows(valor_renome)}{extensao}"
 
         # ✅ cópia segura, preserva original
         if not destino.exists():
